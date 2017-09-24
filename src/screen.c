@@ -536,7 +536,6 @@ void SDL_UpdateRects(SDL_Surface *screen, int numrects, SDL_Rect *rects)
 {
 #if USE_SDL2_RENDERER
 	SDL_UpdateTexture(sdlTexture, NULL, screen->pixels, screen->pitch);
-	SDL_RenderClear(sdlRenderer);
 	SDL_RenderCopy(sdlRenderer, sdlTexture, NULL, NULL);
 	SDL_RenderPresent(sdlRenderer);
 #else

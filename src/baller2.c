@@ -283,7 +283,8 @@ void schuss(int k)
 		}
 		color(1);
 		kugel( (int)x,(int)y );
-		scr_update(Min(ox, x)-3, Min(oy, y)-3, abs(ox-x)+7, abs(oy-y)+7);
+		scr_update(Min(ox, x) - 3, Min(oy, y) - 3,
+		           abs((int)(ox - x)) + 7, abs((int)(oy - y)) + 7);
 		SDL_Delay(8);
 		SDL_PumpEvents();
 

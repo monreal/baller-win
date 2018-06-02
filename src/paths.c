@@ -26,10 +26,6 @@ const char Paths_fileid[] = "Ballerburg paths.c : " __DATE__ " " __TIME__;
 #include "config.h"
 #include "paths.h"
 
-#if defined(WIN32) && !defined(mkdir)
-#define mkdir(name,mode) mkdir(name)
-#endif  /* WIN32 */
-
 #ifdef WIN32
 #define PATHSEP '\\'
 #else
@@ -40,9 +36,6 @@ const char Paths_fileid[] = "Ballerburg paths.c : " __DATE__ " " __TIME__;
 static char sWorkingDir[FILENAME_MAX];    /* Working directory */
 static char sDataDir[FILENAME_MAX];       /* Directory where data files can be found */
 static char sLocaleDir[FILENAME_MAX];     /* Directory where locale files can be found */
-static char sUserHomeDir[FILENAME_MAX];   /* User's home directory ($HOME) */
-static char sProgHomeDir[FILENAME_MAX];   /* Program's home directory ($HOME/.config/ballerburg/) */
-
 
 /**
  * Return pointer to current working directory string
@@ -69,23 +62,6 @@ const char *Paths_GetLocaleDir(void)
 }
 
 /**
- * Return pointer to user's home directory string
- */
-const char *Paths_GetUserHome(void)
-{
-	return sUserHomeDir;
-}
-
-/**
- * Return pointer to program's home directory string
- */
-const char *Paths_GetProgHome(void)
-{
-	return sProgHomeDir;
-}
-
-
-/**
  * Return TRUE if file exists, is readable or writable at least and is not
  * a directory.
  */
@@ -99,16 +75,6 @@ static bool Paths_FileExists(const char *filename)
 		return true;
 	}
 	return false;
-}
-
-
-/**
- * Return TRUE if directory exists.
- */
-static bool Paths_DirExists(const char *path)
-{
-	struct stat buf;
-	return (stat(path, &buf) == 0 && S_ISDIR(buf.st_mode));
 }
 
 
@@ -231,48 +197,6 @@ static char *Paths_InitExecDir(const char *argv0)
 
 
 /**
- * Initialize the users home directory string
- * and program's home directory (~/.config/xxx)
- */
-static void Paths_InitHomeDirs(void)
-{
-	char *psHome;
-
-	psHome = getenv("HOME");
-	if (!psHome)
-	{
-		/* Windows home path? */
-		psHome = getenv("HOMEPATH");
-	}
-	if (!psHome)
-	{
-		/* $HOME not set, so let's use current working dir as home */
-		strcpy(sUserHomeDir, sWorkingDir);
-		strcpy(sProgHomeDir, sWorkingDir);
-	}
-	else
-	{
-		strncpy(sUserHomeDir, psHome, FILENAME_MAX);
-		sUserHomeDir[FILENAME_MAX-1] = 0;
-
-		/* Try to use a .config directory in the users home directory */
-		snprintf(sProgHomeDir, FILENAME_MAX, "%s%c./config/ballerburg",
-		         sUserHomeDir, PATHSEP);
-		if (!Paths_DirExists(sProgHomeDir))
-		{
-			/* Program home directory does not exists yet...
-			 * ...so let's try to create it: */
-			if (1 /*mkdir(sProgHomeDir, 0755) != 0*/)
-			{
-				/* Failed to create, so use user's home dir instead */
-				strcpy(sProgHomeDir, sUserHomeDir);
-			}
-		}
-	}
-}
-
-
-/**
  * Initialize the data directory string
  */
 static void Paths_InitPackageDir(char *psPkgDir, const char *psRelPath,
@@ -326,9 +250,6 @@ void Paths_Init(const char *argv0)
 		/* This should never happen... just in case... */
 		strcpy(sWorkingDir, ".");
 	}
-
-	/* Init the user's home directory string */
-	Paths_InitHomeDirs();
 
 	/* Get the directory where the executable resides */
 	psExecDir = Paths_InitExecDir(argv0);

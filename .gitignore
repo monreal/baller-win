@@ -7,3 +7,4 @@ doc/ballerburg.6.gz
 po/ballerburg.pot
 po/*.mo
 src/ballerburg
+build

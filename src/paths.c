@@ -28,6 +28,7 @@ const char Paths_fileid[] = "Ballerburg paths.c : " __DATE__ " " __TIME__;
 
 #ifdef WIN32
 #define PATHSEP '\\'
+#define realpath(N,R) _fullpath((R),(N),_MAX_PATH)
 #else
 #define PATHSEP '/'
 #endif

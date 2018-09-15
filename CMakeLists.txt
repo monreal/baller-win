@@ -78,6 +78,7 @@ else(ENABLE_SDL2)
 endif(ENABLE_SDL2)
 
 find_package(Math REQUIRED)
+find_package(Intl REQUIRED)
 find_package(Gettext)
 
 # ################
@@ -124,6 +125,14 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
 	endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
+if(CMAKE_COMPILER_IS_MINGW)
+# dynamic build
+# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -lmingw32 -lSDL2main -lSDL2 -mwindows")
+
+# static build
+# see /usr/i686-w64-mingw32/sys-root/mingw/lib/pkgconfig/sdl2.pc
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -lmingw32 -lSDL2main -lSDL2  -mwindows  -Wl,--no-undefined -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lversion -luuid -static-libgcc")
+endif()
 
 # #########################################
 # Create config.h and recurse into subdirs:
